@@ -53,11 +53,11 @@
 			$tagsLinked[] = '<a href="index.php?tag='.urlencode($tag).'" class="tag">'.htmlentities($tag).'</a>';
 		}
 		
-		echo '<dt><em>'.$link['added'].'</em> <a href="'.$link['link'].'" title="'.htmlentities($link['title']).'" class="bookmark">'.htmlentities($link['title']).'</a> <small>('.implode($tagsLinked, ', ').')</small></dt>' . PHP_EOL;
+		echo '<dt><em>'.$link['added'].'</em> <a href="'.$link['link'].'" title="'.$link['title'].'" class="bookmark">'.$link['title'].'</a> <small>('.implode($tagsLinked, ', ').')</small></dt>' . PHP_EOL;
 	
 		if (trim($link['description']) !== '')
 		{
-			echo '<dd>' . ($link['description']) . '</dd>' . PHP_EOL;	
+			echo '<dd>' . $link['description'] . '</dd>' . PHP_EOL;	
 		}
 		
 	}
