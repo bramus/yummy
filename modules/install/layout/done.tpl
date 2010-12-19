@@ -1,0 +1,1 @@
+<p class="ok">Yummy has imported <strong>{$qty}</strong> bookmarks. You may now <a href="index.php">browse your bookmarks</a>.</p>

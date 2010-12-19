@@ -1,0 +1,12 @@
+/**
+ * IE7 Conditional comments
+ * Stylesheet for Yummy!
+ *
+ * @media	screen, projection
+ * @author	Bramus! <bramus@bram.us>
+ */
+
+.clearfix {
+	zoom: 1;
+	/*height: 1%;*/
+}

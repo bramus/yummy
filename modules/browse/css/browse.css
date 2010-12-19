@@ -1,0 +1,79 @@
+.numlinks {
+	color: #AAA;
+	text-align: center;
+	font-style: italic;
+}
+
+/* title */
+h2 span.username {
+	color: #666;
+}
+
+h2 span.tag {
+	color: #999;
+}
+
+/* links (bookmarks) */
+ul.links {
+	border-bottom: 1px solid #CCC;
+}
+
+li.link {
+	padding: 10px 0 10px 0;
+	border-top: 1px solid #CCC;
+	position: relative;
+	margin-left: 60px;
+}
+
+span.date {
+	display: block;
+	width: 60px;
+	position: absolute;
+	font-size: 11px;
+	text-transform: uppercase;
+	left: -60px;
+	top: -1px;
+	padding-top: 10px;
+	height: 15px;
+	line-height: 15px;
+	color: #999;
+	border-top: 1px solid #CCC;
+}
+
+li.link h3 {
+	height: 15px;
+	line-height: 15px;
+	font-size: 15px;
+}
+
+p.description {
+	padding-top: 10px;
+	padding-bottom: 0;
+}
+
+/* tags */
+ul.tags {
+	padding-top: 5px;
+	float: right;
+}
+
+ul.tags li {
+	display: inline;
+}
+
+ul.tags li a {
+	background: #F2F2F2;
+	color: #666;
+	font-size: 11px;
+	text-decoration: none;
+	padding: 3px 8px;
+}
+
+ul.tags li.active a {
+	background: #DBDBDB;
+}
+
+ul.tags li a:hover {
+	background: #8e8e8e;
+	color: #fff;
+}

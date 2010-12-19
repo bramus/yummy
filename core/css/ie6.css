@@ -1,0 +1,12 @@
+/**
+ * IE6 Conditional comments
+ * Stylesheet for Yummy!
+ 
+ * @media	screen, projection
+* @author	Bramus! <bramus@bram.us>
+ */
+
+/* clearfix-fix */
+.clearfix {
+	display: inline-block;
+}

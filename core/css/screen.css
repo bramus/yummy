@@ -1,0 +1,342 @@
+/**
+ * Stylesheet for Yummy!
+ *
+ * @media	screen, projection
+ * @author	Bramus! <bramus@bram.us>
+ */
+
+
+	/**
+	 * General Page Structure
+	 */
+	
+		html, body {
+			height: 100%;
+		}
+		
+		body {
+			font-family: Helvetica, Arial, Verdana, sans-serif;
+			font-size: 13px;
+			line-height: 1.48;
+			color: #333;
+			background: #fff;
+		}
+		
+	/**
+	 * General Type
+	 */
+	
+		h1, h2, h3, h4, h5 {
+			font-weight: 700;
+		}
+		
+		h1 {
+			height: 60px;
+			margin-bottom: 20px;
+		}
+		
+		h1 a {
+			display: block;
+			height: 60px;
+			padding-left: 60px;
+			line-height: 60px;
+			background: transparent url(../img/logo.png) no-repeat 0 50%;		
+		}
+		
+		p {
+			padding-bottom: 20px;
+		}
+		
+		.alignLeft { text-align: left;}
+		.alignRight { text-align: right;}
+		
+		a {
+			color: #1462C0;
+			text-decoration: none;
+		}
+		
+		a:hover {
+			text-decoration: underline;
+		}
+	 
+	/**
+	 * CSS Clearfix
+	 * @see http://www.positioniseverything.net/easyclearing.html
+	 */
+		.clearfix:after {
+			content: ".";
+			display: block;
+			height: 0;
+			clear: both;
+			visibility: hidden;
+		}
+		
+	/**
+	 * Main Positioning
+	 */
+		
+		#siteWrapper {
+			padding: 20px 34px 0 38px;
+			width: 870px;
+			margin: 0 auto;
+		}
+		
+	/**
+	 * The Column & Box System
+	 */
+
+		.columns .column {
+			float: left;
+		}
+
+		/* 2 columns */
+		.column-12 { width: 50%; }
+		
+		/* 6 columns */
+		.columns .column-16 {
+			width: 16.66%;
+		}
+		.columns .padd-16 {
+			padding-left: 16.66%;
+		}
+		.columns .column-26 {
+			width: 33.33%;
+		}
+		.columns .padd-26 {
+			padding-left: 33.33%;
+		}
+		
+		.columns .column-46 {
+			width: 66.66%;
+		}
+		
+		.columns .column-26 label {
+			display: block;
+			text-align: right;
+			padding-right: 8px;	
+		}
+		
+	/**
+	 * The Header
+	 */
+		
+		#header {
+			padding-bottom: 10px;
+			position: relative;
+		}
+		
+		#loginbox {
+			background: #FBFBFB;
+			border-bottom: 1px solid #EAEAEA;
+			border-top: 1px solid #EAEAEA;
+			padding: 5px;
+			text-align: center;
+			color: #999;
+			line-height: 14px;
+		
+			margin-bottom: 20px;
+		}
+		
+		#loginbox a {
+			color: #666;
+		}
+		
+		#loginbox a:hover {
+			color: #2E301C;
+		}
+		
+	/**
+	 * Form Error Box
+	 */
+
+		.boxInner {
+			padding: 10px;
+		}
+		
+	
+		#boxError {	
+			border:1px solid #CC0000;
+			padding: 10px;
+			color: #CC0000;
+			margin: 20px auto 0;
+			/* width: 500px; */
+			padding-left: 30px;
+			background: #EFA4A4 url(../img/icnError.gif) no-repeat 4px 11px;
+		}
+		
+		#boxError p {
+			padding-bottom: 10px;
+		}
+		
+		#boxError ul {
+			list-style: circle;
+			padding-left: 20px;
+			padding-bottom: 0;
+			font-size: 12px;
+		}
+		
+		
+	/*
+	 *Pagination
+	 */
+	
+		.paginationWrap {
+			width: 100%;
+			overflow: hidden;
+		}
+	
+		.pagination {
+			float: left;
+			position: relative;
+			left: 50%;
+		}
+	
+		.pagination ul {
+			padding: 18px 0;
+			z-index: 2;
+			overflow: hidden;
+			position: relative;
+			left: -50%;
+		}
+	
+		.pagination li {
+			float: left;
+			list-style: none;
+			margin: 0 5px 0 0;
+			text-decoration: none;
+			padding: 0;
+			text-align: center;
+			line-height: 14px;
+			border: 1px solid #979797;
+		}
+	
+		.pagination li span {
+			float: left;
+			display: block;
+			padding: 4px 5px;
+			color: #AB9374;
+			min-width: 12px;
+		}
+	
+		.pagination li.currentpage {
+			border: 0;
+		}
+		
+		.pagination li.currentpage span {
+			font-weight: 700;
+			color: #000;
+			padding: 5px 4px;
+		}
+	
+		.pagination li a:link,
+		.pagination li a:visited {
+			float: left;
+			display: block;
+			padding: 4px 5px;
+			text-decoration: none;
+			min-width: 12px;
+		}
+	
+		li.ellipsis {
+			border: 0;
+		}
+	
+		li.ellipsis span {
+			color: #CCC;
+		}
+	
+		.pagination li a:hover,
+		.pagination li a:active {
+			color: #FFF;
+			background: #1462C0;
+		}
+	
+		li.nextPage, li.previousPage {
+			border: 0px;
+		}
+	
+		.pagination li.nextPage {
+			margin-left: 10px;
+		}
+	
+		.pagination li.previousPage {
+			margin-right: 15px;
+		}
+
+
+	/**
+	 * The Footer
+	 */
+		#footer {
+			color: #999;
+			text-align: center;
+			font-size: 12px;
+			font-style: italic;
+			margin: 40px 0 13px;
+		}
+		
+		#footer a {
+			color: #999;
+		}
+		
+		#footer a:hover {
+			color: #555;
+		}
+		
+	/*
+	 * Forms
+	 */
+
+		form dt label {
+			font-size: 11px;
+			font-weight: 400;
+			text-transform: uppercase;
+			color: #000;
+		}
+		
+		form dd, form dt {
+			height: 30px;
+			line-height: 30px;
+			color: #666;
+		}
+		
+		form dl {
+			margin-bottom: 20px;
+			width: 500px;
+			margin: 0 auto 0;
+		}
+		
+	/*
+	 * Error and info boxes
+	 */
+
+		p.warning, p.error, p.ok, p.success, p.info {
+			padding: 5px 5px 5px 30px;
+			line-height: 25px;
+			height: 25px;
+			margin: 0 0 5px 0;
+		}
+
+	   p.warning {
+	        border: 1px solid #d38c1b;
+	        background: #fbf2c3 url(../img/icnWarning.gif) no-repeat 4px 50%;
+	    }
+	    
+	    p.error {
+	        border:1px solid #CC0000;
+	        background: #EFA4A4 url(../img/icnError.gif) no-repeat 4px 50%;
+	        margin: 0 0 5px 0;
+		}
+	    
+	    p.ok, p.success {
+	        border: 1px solid #629A34;
+	        background: #d7ebc6 url(../img/icnOK.gif) no-repeat 4px 50%;
+	    }
+	    
+	    p.info {
+	        border: 1px solid #345092;
+	        background: #c2cade url(../img/icnInfo.gif) no-repeat 4px 50%;
+	    }
+
+		
+/*EOF*/

@@ -1,0 +1,26 @@
+/* Prerequisites */
+
+ul.prerequisites {
+	margin: 20px 0 30px;
+}
+
+ul.prerequisites li {
+	padding-left: 20px;
+	background: transparent url(../../../core/img/icnError.gif) no-repeat 0 50%;
+}
+
+ul.prerequisites li.ok {
+	background: transparent url(../../../core/img/icnOk.gif) no-repeat 0 50%;
+}
+
+p.prerequisites {
+}
+
+/* Install */
+.box {
+	padding-bottom: 40px;
+}
+
+#boxUpload form {
+	padding: 20px 0;
+}

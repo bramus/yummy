@@ -1,0 +1,9 @@
+	/**
+	 * Login Box
+	 */
+		
+		#username, #password {
+			width: 200px;
+			border: 1px solid #DDDDDD;
+			padding: 3px;
+		}
