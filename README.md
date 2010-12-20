@@ -28,4 +28,4 @@ Currently Yummy only allows you to browse your links. Soon, more features will b
 - etc.
 
 
-_ Ñ[Bramus!](http://www.bram.us/)_
+_â€”[Bramus!](http://www.bram.us/)_
