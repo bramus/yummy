@@ -7,7 +7,7 @@
 {option:oHasLinks}
 <ul class="links">
 	{iteration:iLinks}
-	<li class="link clearfix">
+	<li class="link clearfix private-{$private}">
 		{option:newDate}<span class="date">{$addedNice}</span>{/option:newDate}
 		<h3><a href="{$link|htmlentities}" title="{$title|htmlentities}" data-added="{$added}" data-private="{$private}" class="link">{$title|htmlentities}</a></h3>
 		{option:oDescription}<p class="description">{$description|htmlentities}</p>{/option:oDescription}
