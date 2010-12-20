@@ -6,8 +6,8 @@
 	
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 	
-	<link rel="stylesheet" type="text/css" media="screen" href="core/css/reset.css" />
-	<link rel="stylesheet" type="text/css" media="screen" href="core/css/screen.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="/core/css/reset.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="/core/css/screen.css" />
 	<!--[if lte IE 6]><link rel="stylesheet" type="text/css" media="screen" href="/modules/core/layout/css/ie6.css" /><![endif]-->
 	<!--[if IE 7]><link rel="stylesheet" type="text/css" media="screen" href="/modules/core/layout/css/ie7.css" /><![endif]-->
 	
@@ -22,7 +22,7 @@
 		
 		<!-- header -->
 		<div id="header">
-			<h1><a href="index.php">Yummy! &mdash; A self hosted Delicious</a></h1>
+			<h1><a href="/">Yummy! &mdash; A self hosted Delicious</a></h1>
 			{option:oNotLoggedIn}<p id="loginbox">You are not logged in, private links are hidden <em>(<a href="{$loginLink|htmlentities}" title="login" id="loginLink">log in</a>)</em></p>{/option:oNotLoggedIn}
 			{option:oLoggedIn}<p id="loginbox">Welcome, <strong>{$username}</strong> <em>(<a href="{$logoutLink|htmlentities}" title="logout" id="logoutLink">log out</a>)</em></p>{/option:oLoggedIn}
 			{option:oNeedToLogIn}<p id="loginbox" class="note">You need to be logged in to do that</p>{/option:oNeedToLogIn}

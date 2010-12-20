@@ -46,7 +46,7 @@ class BrowseController extends PlonkController {
 		{
 			
 			// assign the logout link option
-			$this->mainTpl->assign('logoutLink', $_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=auth&' . PlonkWebsite::$viewKey .'=logout');
+			$this->mainTpl->assign('logoutLink', '/auth/logout');
 			$this->mainTpl->assign('username', PlonkSession::get('username'));
 			$this->mainTpl->assignOption('oLoggedIn');
 			
@@ -57,7 +57,7 @@ class BrowseController extends PlonkController {
 		{
 			
 			// assign the logout link option
-			$this->mainTpl->assign('loginLink', $_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=auth&' . PlonkWebsite::$viewKey .'=login');
+			$this->mainTpl->assign('loginLink', '/auth/login');
 			$this->mainTpl->assignOption('oNotLoggedIn');
 			
 		
@@ -120,25 +120,25 @@ class BrowseController extends PlonkController {
 	 */
 	public function showAll()
 	{
-		
+				
 		// Get necessary vars
 		
 			$loggedIn	= (PlonkSession::exists('loggedIn') && (PlonkSession::get('loggedIn') === true));
 			
 			// Paging
-			$curPage 	= (int) PlonkFilter::getGetValue('p', null, 1);
+			$curPage 	= max(1, isset($this->urlParts[2]) ? (int) $this->urlParts[2] : 1);
 			$numLinks	= BrowseDB::getNumLinks($loggedIn);
 			$numPages	= max(ceil((int) $numLinks / self::limitPerPage), 1);
 			
 			// numLinks is false, redirect to the installation script
 			// (if it's installed yet without links imported, it should be 0)
 			if ($numLinks === false)
-				PlonkWebsite::redirect($_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=install');
+				PlonkWebsite::redirect('/install');
 				
 			
 			// Check vars for validity
 			if (($curPage < 1) || ($curPage > $numPages))
-				PlonkWebsite::redirect($_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=' . MODULE);
+				PlonkWebsite::redirect('/' . MODULE);
 			
 			// Get links for this page
 			$links 		= BrowseDB::getLinks($curPage - 1, self::limitPerPage, $loggedIn);
@@ -148,7 +148,7 @@ class BrowseController extends PlonkController {
 		
 			// assign vars in our main layout tpl
 			$this->mainTpl->assign('pageTitle', 		'Yummy! &mdash; '.htmlentities(USERNAME).'&lsquo;s bookmarks ('.$curPage.'/'.$numPages.')');
-			$this->mainTpl->assign('pageMeta', 			'<link rel="stylesheet" type="text/css" href="modules/browse/css/browse.css" />' . PHP_EOL);
+			$this->mainTpl->assign('pageMeta', 			'<link rel="stylesheet" type="text/css" href="/modules/browse/css/browse.css" />' . PHP_EOL);
 						
 			// The logout link
 			$this->processLogoutLink();
@@ -240,34 +240,36 @@ class BrowseController extends PlonkController {
 		// Get necessary vars
 		
 			$loggedIn	= (PlonkSession::exists('loggedIn') && (PlonkSession::get('loggedIn') === true));
-			$tag		= PlonkFilter::getGetValue('tag', null, '');
+			$tag		= isset($this->urlParts[2]) ? $this->urlParts[2] : '';
 			
 			// check if tag exists!
-			if (!BrowseDB::tagExists($tag)) PlonkWebsite::redirect($_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=' . MODULE);
+			if (!BrowseDB::tagExists($tag)) PlonkWebsite::redirect('/' . MODULE);
 			
 			// Paging
-			$curPage 	= (int) PlonkFilter::getGetValue('p', null, 1);
+			$curPage 	= max(1, isset($this->urlParts[3]) ? (int) $this->urlParts[3] : 1);
 			$numLinks	= BrowseDB::getNumLinksForTag($tag, $loggedIn);
 			$numPages	= max(ceil((int) $numLinks / self::limitPerPage), 1);
 			
 			// numLinks is false, redirect to the installation script
 			// (if it's installed yet without links imported, it should be 0)
 			if ($numLinks === false)
-				PlonkWebsite::redirect($_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=install');
+				PlonkWebsite::redirect('/install');
 			
 			// Check vars for validity
 			if (($curPage < 1) || ($curPage > $numPages))
-				PlonkWebsite::redirect($_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=' . MODULE);
+				PlonkWebsite::redirect('/' . MODULE);
 			
 			// Get links for this page
 			$links 		= BrowseDB::getLinksForTag($tag, $curPage - 1, self::limitPerPage, $loggedIn);
 		
+			// rework tag for output
+			if ($tag === '') $tag = '(untagged)';
 			
 		// Main Layout
 		
 			// assign vars in our main layout tpl
 			$this->mainTpl->assign('pageTitle', 		'Yummy! &mdash; '.htmlentities(USERNAME).'&lsquo;s '.htmlentities($tag).' bookmarks ('.$curPage.'/'.$numPages.')');
-			$this->mainTpl->assign('pageMeta', 			'<link rel="stylesheet" type="text/css" href="modules/browse/css/browse.css" />' . PHP_EOL);
+			$this->mainTpl->assign('pageMeta', 			'<link rel="stylesheet" type="text/css" href="/modules/browse/css/browse.css" />' . PHP_EOL);
 						
 			// The logout link
 			$this->processLogoutLink();

@@ -7,7 +7,8 @@
  * @package		Plonk
  * @subpackage	website
  * @author		Bramus Van Damme <bramus.vandamme@kahosl.be>
- * @version		1.1 - Now includes the version number (was missing from 1.0)
+ * @version		1.2 - Now plays nice with mod_rewrite
+ * 				1.1 - Now includes the version number (was missing from 1.0)
  * 				1.0 - First release
  */
 
@@ -21,7 +22,7 @@ class PlonkController
 	/**
 	 * The version of this class
 	 */
-	const version = 1.1;
+	const version = 1.2;
 	
 	
 	/**
@@ -64,6 +65,22 @@ class PlonkController
 	 * @var PlonkTemplate
 	 */
 	protected $pageTpl;
+
+	/**
+	 * The url parts
+	 * @var Array
+	 */
+	protected $urlParts;
+	
+	
+	/**
+	 * Constructor
+	 * @param array $urlParts
+	 */
+	public function __construct(array $urlParts)
+	{
+		$this->urlParts = $urlParts;
+	}
 	
 	
 	/**
@@ -105,16 +122,16 @@ class PlonkController
 	 */
 	final private function defineView()
 	{
-
+		
 		// view set, get it.
-		if (PlonkFilter::getGetValue(PlonkWebsite::$viewKey) !== null) {
+		if (isset($this->urlParts[1])) {
 
 			// make it ourselves a bit easier to work
-			$this->view = strtolower(PlonkFilter::getGetValue(PlonkWebsite::$viewKey));
+			$this->view = strtolower($this->urlParts[1]);
 
 			// make sure the view is allowed. If not, redirect to the module itself (with no view set) with a 404
 			if (!in_array($this->view, $this->views))
-				PlonkWebsite::redirect('index.php?' . PlonkWebsite::$moduleKey . '=' . strtolower(MODULE), 404);
+				PlonkWebsite::redirect('/' . strtolower(MODULE), 404);
 
 		// no formAction set: set view to the default view (the first one defined)
 		} else {

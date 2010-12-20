@@ -12,7 +12,7 @@
 	</div>
 {/option:oErrors}
 
-	<form action="{$formUrl|htmlentities}" method="post" enctype="multipart/formdata">
+	<form action="{$formUrl|htmlentities}" method="post" enctype="multipart/form-data">
 		<fieldset>
 			<dl class="clearfix columns">
 				<dt class="column column-26"><label for="file">Exported file:</label></dt>

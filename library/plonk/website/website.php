@@ -7,7 +7,9 @@
  * @package		Plonk
  * @subpackage	website
  * @author		Bramus Van Damme <bramus.vandamme@kahosl.be>
- * @version		1.2 - By default includes PlonkSession and PlonkCookie
+ * @author		Bramus! <bramus@bram.us>
+ * @version		1.3 - Plays nice with mod_rewrite
+ * 				1.2 - By default includes PlonkSession and PlonkCookie
  * 					  Automatically starts a session
  * 				1.1 - Added getDB function to get a PlonkDB instance
  * 					  Now includes the version number (was missing from 1.0)
@@ -21,7 +23,7 @@ class PlonkWebsite
 	/**
 	 * The version of this class
 	 */
-	const version = 1.1;
+	const version = 1.3;
 	
 	
 	/**
@@ -50,6 +52,12 @@ class PlonkWebsite
 	 * @var String
 	 */
 	static $viewKey;
+	
+	/**
+	 * 
+	 */
+	private $urlString = '';
+	private $urlParts = array();
 	
 	
 	/**
@@ -95,16 +103,16 @@ class PlonkWebsite
 		if (sizeof($this->modules) === 0)	throw new Exception('Cannot initialize website: no modules defined');
 
 		// if module is set in URL and valid
-		if ((PlonkFilter::getGetValue(self::$moduleKey) !== null) && in_array(PlonkFilter::getGetValue(self::$moduleKey), $this->modules)) {
+		if (isset($this->urlParts[0]) && in_array($this->urlParts[0], $this->modules)) {
 
 			// store module
-			define('MODULE', PlonkFilter::getGetValue(self::$moduleKey));
+			define('MODULE', $this->urlParts[0]);
 
 		// no module set
 		} else {
 
 			// redirect to the default module
-			self::redirect('index.php?' . self::$moduleKey . '=' . urlencode($this->modules[0]), 301);
+			self::redirect('/' . urlencode($this->modules[0]), 301);
 
 		}
 
@@ -148,7 +156,7 @@ class PlonkWebsite
 		$controller = ucfirst(MODULE).'Controller';
 		
 		// return new instance of the controller
-		return new $controller();
+		return new $controller($this->urlParts);
 
 	}
 	
@@ -198,6 +206,10 @@ class PlonkWebsite
 		// Start a session
 		PlonkSession::start();
 		
+		// store the url string
+		$this->urlString 	= $_SERVER['REQUEST_URI'];
+		$this->urlParts 	= explode('/', substr($_SERVER['REQUEST_URI'], 1));
+		
 	}
 	
 	
@@ -226,7 +238,7 @@ class PlonkWebsite
 		}
 	
 	}
-	
+
 	
 	/**
 	 * Returns the version of this class

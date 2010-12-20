@@ -7,7 +7,7 @@
 </ul>
 
 {option:oConfigOk}
-<p class="prerequisites">Everything seems OK, <a href="index.php?module=install&amp;view=install">Proceed with installation &raquo;</a></p>
+<p class="prerequisites">Everything seems OK, <a href="/install/install">Proceed with installation &raquo;</a></p>
 {/option:oConfigOk}
 
 {option:oConfigNotOk}

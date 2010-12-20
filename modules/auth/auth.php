@@ -81,7 +81,7 @@ class AuthController extends PlonkController {
 			// Login succeeded: redirect to the the default view (change)
 			if (PlonkSession::exists('loggedIn') && (PlonkSession::get('loggedIn') === true))
 			{
-				PlonkWebsite::redirect($_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=' . urlencode($this->from));
+				PlonkWebsite::redirect('/' . urlencode($this->from));
 			}
 			
 			// login failed
@@ -148,7 +148,7 @@ class AuthController extends PlonkController {
 			$this->mainTpl->assignOption('oNotLoggedIn');
 			
 		// loginlink
-		$this->mainTpl->assign('loginLink', $_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=auth&' . PlonkWebsite::$viewKey .'=login');
+		$this->mainTpl->assign('loginLink', '/auth/login');
 		
 	}
 	
@@ -159,16 +159,16 @@ class AuthController extends PlonkController {
 	{
 			
 		// if we are logged in, go to home
-		if (PlonkSession::exists('loggedIn') && (PlonkSession::get('loggedIn') === true))	PlonkWebsite::redirect($_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=home');
+		if (PlonkSession::exists('loggedIn') && (PlonkSession::get('loggedIn') === true))	PlonkWebsite::redirect('/');
 		
 		// get from (if set via URL)
-		$this->from = ($this->from == '') ? PlonkFilter::getGetValue('from') : $this->from;
+		$this->from = ($this->from == '') ? (isset($this->urlParts[2]) ? $this->urlParts[2] : '') : $this->from;
 				
 		// Main Layout
 		
 			// assign vars in our main layout tpl
 			$this->mainTpl->assign('pageTitle', 		'Yummy! - Log in');
-			$this->mainTpl->assign('pageMeta', 			'<link rel="stylesheet" type="text/css" href="modules/auth/css/auth.css" />' . PHP_EOL . '<script type="text/javascript" src="modules/auth/js/login.js"></script>');
+			$this->mainTpl->assign('pageMeta', 			'<link rel="stylesheet" type="text/css" href="/modules/auth/css/auth.css" />' . PHP_EOL . '<script type="text/javascript" src="/modules/auth/js/login.js"></script>');
 			
 			// The logout link
 			$this->processLogoutLink();
@@ -184,7 +184,7 @@ class AuthController extends PlonkController {
 				$this->pageTpl->assign('password', 		$this->password);
 				
 			// form URL
-				$this->pageTpl->assign('formUrl', 	$_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=auth&' . PlonkWebsite::$viewKey . '=login');
+				$this->pageTpl->assign('formUrl', 	'/auth/login');
 
 	}
 	
@@ -199,7 +199,7 @@ class AuthController extends PlonkController {
 		AuthDB::logout();
 		
 		// redirect to the login page
-		PlonkWebsite::redirect($_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=home');
+		PlonkWebsite::redirect('/');
 		
 	}
 

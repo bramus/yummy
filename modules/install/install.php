@@ -44,7 +44,7 @@ class InstallController extends PlonkController {
 		
 		// User must be logged in
 		if (!PlonkSession::exists('loggedIn') || (PlonkSession::get('loggedIn') !== true))
-			PlonkWebsite::redirect($_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=install');
+			PlonkWebsite::redirect('/install');
 			
 		// No file set
 		if (!isset($_FILES['file']) || !isset($_FILES['file']['tmp_name']) || ($_FILES['file']['tmp_name'] == false))
@@ -69,7 +69,7 @@ class InstallController extends PlonkController {
 			
 				$numLinks = InstallDB::importBackup($lines);
 				
-				PlonkWebsite::redirect($_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=install&view=done&qty=' . $numLinks);
+				PlonkWebsite::redirect('/install/done/' . $numLinks);
 				
 			}
 			
@@ -127,7 +127,7 @@ class InstallController extends PlonkController {
 		{
 			
 			// assign the logout link option
-			$this->mainTpl->assign('logoutLink', $_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=auth&' . PlonkWebsite::$viewKey .'=logout');
+			$this->mainTpl->assign('logoutLink', '/auth/logout');
 			$this->mainTpl->assign('username', PlonkSession::get('username'));
 			$this->mainTpl->assignOption('oLoggedIn');
 			
@@ -138,7 +138,7 @@ class InstallController extends PlonkController {
 		{
 			
 			// assign the logout link option
-			$this->mainTpl->assign('loginLink', $_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=auth&' . PlonkWebsite::$viewKey .'=login');
+			$this->mainTpl->assign('loginLink', '/auth/login');
 			$this->mainTpl->assignOption('oNotLoggedIn');
 			
 		
@@ -153,13 +153,13 @@ class InstallController extends PlonkController {
 			
 		// Prerequisites have been checked before, redirect to install view
 			if (PlonkSession::exists('prerequisites') && (PlonkSession::get('prerequisites') === true))
-				PlonkWebsite::redirect($_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=' . MODULE . '&view=install');
+				PlonkWebsite::redirect('/' . MODULE . '/install');
 			
 		// Main Layout
 		
 			// assign vars in our main layout tpl
 			$this->mainTpl->assign('pageTitle', 		'Yummy! &mdash; Installation &mdash; Prerequisites');
-			$this->mainTpl->assign('pageMeta', 			'<link rel="stylesheet" type="text/css" href="modules/install/css/install.css" />' . PHP_EOL);
+			$this->mainTpl->assign('pageMeta', 			'<link rel="stylesheet" type="text/css" href="/modules/install/css/install.css" />' . PHP_EOL);
 						
 			// The logout link
 			$this->processLogoutLink();
@@ -189,17 +189,17 @@ class InstallController extends PlonkController {
 			
 		// Prerequisites have not been checked yet, redirect to prerequisites view
 			if (!PlonkSession::exists('prerequisites') || (PlonkSession::get('prerequisites') !== true))
-				PlonkWebsite::redirect($_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=' . MODULE);
+				PlonkWebsite::redirect('/' . MODULE);
 		
 		// User must be logged in
 			if (!PlonkSession::exists('loggedIn') || (PlonkSession::get('loggedIn') !== true))
-				PlonkWebsite::redirect($_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=auth&' . PlonkWebsite::$viewKey . '=login&from=install');
+				PlonkWebsite::redirect('/auth/login/install');
 		
 		// Main Layout
 		
 			// assign vars in our main layout tpl
 			$this->mainTpl->assign('pageTitle', 		'Yummy! &mdash; Installation &mdash; Installing');
-			$this->mainTpl->assign('pageMeta', 			'<link rel="stylesheet" type="text/css" href="modules/install/css/install.css" />' . PHP_EOL);
+			$this->mainTpl->assign('pageMeta', 			'<link rel="stylesheet" type="text/css" href="/modules/install/css/install.css" />' . PHP_EOL);
 						
 			// The logout link
 			$this->processLogoutLink();
@@ -210,7 +210,7 @@ class InstallController extends PlonkController {
 			$this->processErrors();
 		
 			// formUrl
-			$this->pageTpl->assign('formUrl', 	$_SERVER['PHP_SELF'] . '?' . PlonkWebsite::$moduleKey . '=install&' . PlonkWebsite::$viewKey . '=install');
+			$this->pageTpl->assign('formUrl', 	'/' . MODULE . '/install');
 			
 			// possibly installed already?
 			if (InstallDB::possiblyInstalled()) $this->pageTpl->assignOption('linksFound');
@@ -224,7 +224,7 @@ class InstallController extends PlonkController {
 		
 			// assign vars in our main layout tpl
 			$this->mainTpl->assign('pageTitle', 		'Yummy! &mdash; Installation &mdash; Installation Complete');
-			$this->mainTpl->assign('pageMeta', 			'<link rel="stylesheet" type="text/css" href="modules/install/css/install.css" />' . PHP_EOL);
+			$this->mainTpl->assign('pageMeta', 			'<link rel="stylesheet" type="text/css" href="/modules/install/css/install.css" />' . PHP_EOL);
 						
 			// The logout link
 			$this->processLogoutLink();
@@ -232,7 +232,7 @@ class InstallController extends PlonkController {
 		// Page Layout
 		
 			// qty
-			$this->pageTpl->assign('qty', 	(int) PlonkFilter::getGetValue('qty', null, 0));
+			$this->pageTpl->assign('qty', (isset($this->urlParts[2]) ? (int) $this->urlParts[2] : 0));
 		
 	}
 	
