@@ -25,8 +25,7 @@ Currently Yummy only allows you to browse your links. Soon, more features will b
 - tags list
 - ability to add new links
 - ability to edit links
-- adjust the pagination so that it feels more Delicious-like.
 - etc.
 
 
-_â€” [Bramus!](http://www.bram.us/)_
+_ Ñ[Bramus!](http://www.bram.us/)_
