@@ -82,3 +82,63 @@ ul.tags li a:hover {
 	background: #8e8e8e;
 	color: #fff;
 }
+
+/* main & sidebar */
+#main {
+	float: left;
+	width: 700px;
+}
+#sidebar {
+	width: 150px;
+	float: right;
+}
+
+#sidebar h4 {
+	padding-top: 10px;
+}
+
+/* tagslist */
+ul.tagslist {
+	font-size: 11px;
+	margin-bottom: 20px;
+}
+
+ul.tagslist li {
+	border-top: 1px solid #ccc;
+}
+
+ul.tagslist li a {
+	overflow: hidden;
+	display: block;
+}
+
+ul.tagslist li a span {
+	display: block;
+	float: left;
+	height: 20px;
+	line-height: 20px;
+}
+
+ul.tagslist li a span.tag {
+	width: 128px;
+	padding-left: 2px;
+}
+
+ul.tagslist li a span.qty {
+	width: 18px;
+	padding-right: 2px;
+	text-align: right;
+	color: #666;
+	font-weight: 700;
+}
+
+ul.tagslist li a:hover span.tag {
+	text-decoration: underline;
+}
+ul.tagslist li a:hover span.qty {
+	color: #333;
+}
+p.mute {
+	color: #CCC;
+	font-style: italic;
+}

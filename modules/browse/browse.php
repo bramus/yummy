@@ -114,6 +114,44 @@ class BrowseController extends PlonkController {
 			
 	}
 	
+	private function processTagsIntoTemplate(array $tagsList, $extra = '')
+	{
+		
+		// has tags
+		if (sizeof($tagsList) > 0)
+		{
+			
+			$extra = (trim($extra) !== '') ? $extra . '+' : '';
+			
+			$tpl = new PlonkTemplate('modules/browse/layout/tagslist.tpl');
+			
+			$tpl->setIteration('iTags');
+			
+			foreach ((array) $tagsList as $tag) {
+				$tpl->assignIteration('extratag', $extra);
+				$tpl->assignIteration('tag', $tag['tag']);
+				$tpl->assignIteration('qty', $tag['qty']);
+				$tpl->refillIteration();
+			}
+			
+			$tpl->parseIteration();
+			
+			$content = $tpl->getContent();
+			
+			$tpl = null;
+		}
+		
+		// no tags
+		else {
+			
+			$content = '<p class="mute">(none)</p>';
+			
+		}
+		
+		return $content;		
+		
+	}
+	
 	
 	/**
 	 * All links
@@ -224,9 +262,14 @@ class BrowseController extends PlonkController {
 			// The pagination
 			$this->processPagination($curPage, $numPages);
 			
+			// Some needed vars
 			$this->pageTpl->assign('numLinks', $numLinks);
 			$this->pageTpl->assign('MODULE', MODULE);
 			$this->pageTpl->assign('username', USERNAME);
+			
+			// The tags list
+			$tagsList = BrowseDB::getTagslist($loggedIn);
+			$this->pageTpl->assign('topTags', $this->processTagsIntoTemplate($tagsList));
 			
 	}
 	
@@ -240,14 +283,15 @@ class BrowseController extends PlonkController {
 		// Get necessary vars
 		
 			$loggedIn	= (PlonkSession::exists('loggedIn') && (PlonkSession::get('loggedIn') === true));
-			$tag		= isset($this->urlParts[2]) ? $this->urlParts[2] : '';
-			
-			// check if tag exists!
-			if (!BrowseDB::tagExists($tag)) PlonkWebsite::redirect('/' . MODULE);
+			$tags		= explode('+', (isset($this->urlParts[2]) ? $this->urlParts[2] : ''));
+			$tags 		= array_map('urldecode',$tags);
+						
+			// check if tag(s) exist(s)!
+			if (!BrowseDB::tagExists($tags, $loggedIn)) PlonkWebsite::redirect('/' . MODULE);
 			
 			// Paging
 			$curPage 	= max(1, isset($this->urlParts[3]) ? (int) $this->urlParts[3] : 1);
-			$numLinks	= BrowseDB::getNumLinksForTag($tag, $loggedIn);
+			$numLinks	= BrowseDB::getNumLinksForTag($tags, $loggedIn);
 			$numPages	= max(ceil((int) $numLinks / self::limitPerPage), 1);
 			
 			// numLinks is false, redirect to the installation script
@@ -260,15 +304,16 @@ class BrowseController extends PlonkController {
 				PlonkWebsite::redirect('/' . MODULE);
 			
 			// Get links for this page
-			$links 		= BrowseDB::getLinksForTag($tag, $curPage - 1, self::limitPerPage, $loggedIn);
+			$links 		= BrowseDB::getLinksForTag($tags, $curPage - 1, self::limitPerPage, $loggedIn);
 		
 			// rework tag for output
-			if ($tag === '') $tag = '(untagged)';
+			$tagsNice 	= implode('+', $tags);
+			if ($tagsNice === '') $tagsNice = '(untagged)';
 			
 		// Main Layout
 		
 			// assign vars in our main layout tpl
-			$this->mainTpl->assign('pageTitle', 		'Yummy! &mdash; '.htmlentities(USERNAME).'&lsquo;s '.htmlentities($tag).' bookmarks ('.$curPage.'/'.$numPages.')');
+			$this->mainTpl->assign('pageTitle', 		'Yummy! &mdash; '.htmlentities(USERNAME).'&lsquo;s '.htmlentities($tagsNice).' bookmarks ('.$curPage.'/'.$numPages.')');
 			$this->mainTpl->assign('pageMeta', 			'<link rel="stylesheet" type="text/css" href="/modules/browse/css/browse.css" />' . PHP_EOL);
 						
 			// The logout link
@@ -313,20 +358,20 @@ class BrowseController extends PlonkController {
 						$this->pageTpl->assignIteration('description',	$link['description']);
 					}
 					
-					$tags = explode(',', $link['tags']);
+					$linktags = explode(',', $link['tags']);
 					
-					if (sizeof($tags) > 0)
+					if (sizeof($linktags) > 0)
 					{
 						
 						$this->pageTpl->assignIterationOption('oHasTags');
 						
 						$this->pageTpl->setIteration('iTags', 'iLinks');
 						
-						foreach ($tags as $ltag)
+						foreach ($linktags as $ltag)
 						{
 							
 							$this->pageTpl->assignIteration('tag',	$ltag);
-							if ($ltag == $tag) $this->pageTpl->assignIterationOption('oActive');
+							if (in_array(urldecode($ltag), $tags)) $this->pageTpl->assignIterationOption('oActive');
 							$this->pageTpl->refillIteration('iTags');
 							
 						}
@@ -346,10 +391,20 @@ class BrowseController extends PlonkController {
 			// The pagination
 			$this->processPagination($curPage, $numPages);
 			
+			// Other needed vars
 			$this->pageTpl->assign('numLinks', 	$numLinks);
 			$this->pageTpl->assign('MODULE', 	MODULE);
 			$this->pageTpl->assign('username', 	USERNAME);
-			$this->pageTpl->assign('tag', 		$tag);
+			$this->pageTpl->assign('tag', 		$tagsNice);
+			$this->pageTpl->assign('tagForUri', $this->urlParts[2]);
+			
+			// The tags list
+			$tagsList = BrowseDB::getTagslist($loggedIn);
+			$this->pageTpl->assign('topTags', $this->processTagsIntoTemplate($tagsList));
+			
+			// Related tags
+			$relatedTags = BrowseDB::getRelatedTagsForTag($tags, $loggedIn);
+			$this->pageTpl->assign('relatedTags', $this->processTagsIntoTemplate($relatedTags, $this->urlParts[2]));
 			
 	}
 

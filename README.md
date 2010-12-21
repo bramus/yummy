@@ -1,4 +1,4 @@
-# Yummy
+# Yummy — Version 2.1
 
 A self hosted Delicious (with del.icio.us import).
 
@@ -18,14 +18,17 @@ Once imported you are able to browse through them, in a true Delicious style.
 3) Import `yummy.sql` in a MySQL database of choice to create the necessary tables.
 4) Point your browser to `index.php` and continue with the installation.
 
+## Upgrading from 2.0
+
+Unfortunately Yummy 2.1 is not a drop in replacement as the DB schema has changed a tad.
+You'll need to re-import a Delicious export for this version to work properly.
 
 ## Note
 
 Currently Yummy only allows you to browse your links. Soon, more features will be added:
-- tags list
 - ability to add new links
 - ability to edit links
 - etc.
 
 
-_—[Bramus!](http://www.bram.us/)_
+_— [Bramus!](http://www.bram.us/)_

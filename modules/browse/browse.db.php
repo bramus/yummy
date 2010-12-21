@@ -40,19 +40,43 @@ class BrowseDB
 	 * @param string $tag
 	 * @param bool $includePrivate
 	 */
-	public static function getNumLinksForTag($tag, $includePrivate = false)
+	public static function getNumLinksForTag($tags, $includePrivate = false)
 	{
 		
 		$db = PlonkWebsite::getDB();
 		
 		try
 		{
-			if ((bool) $includePrivate)
-				$numLinks = (int) $db->getVar(sprintf('SELECT COUNT(*) FROM links INNER JOIN links_tags ON links.id = links_tags.link_id WHERE links_tags.tag = "%s"', $db->escape((string) $tag)));
-			else
-				$numLinks = (int) $db->getVar(sprintf('SELECT COUNT(*) FROM links INNER JOIN links_tags ON links.id = links_tags.link_id WHERE links_tags.tag = "%s" AND links.private = 0', $db->escape((string) $tag)));
+			
+			// build query
+				$query[0] = 'SELECT COUNT(*) FROM links INNER JOIN links_tags AS lt0 ON links.id = lt0.link_id';
 				
-			return $numLinks;
+				foreach ((array) $tags as $i => $tag)
+				{
+					
+					// first tag (where clause)
+					if ($i == 0)
+					{
+						$query[1] = sprintf(' WHERE lt0.tag = "%s"', $db->escape($tag));
+					}
+					
+					// other tag (and it)
+					else {
+					
+						$query[0] .= ' INNER JOIN links_tags AS lt' . $i . ' ON lt0.link_id = lt' . $i . '.link_id';
+						$query[1] .= sprintf(' AND lt'.$i.'.tag = "%s"', $db->escape($tag));
+						
+					}
+					
+				}
+				
+				if (!$includePrivate)
+					$query[1] .= ' AND links.private = 0';
+			
+			// execute query and return result
+				$numLinks = (int) $db->getVar(implode($query));
+				return $numLinks;
+			
 		} catch (Exception $e) {
 			return false;
 		}
@@ -83,32 +107,105 @@ class BrowseDB
 	}
 	
 	
-	public static function getLinksForTag($tag, $page, $limitPerPage, $includePrivate = false)
+	/**
+	 * Gets all bookmarks tagged with the given tag(s)
+	 * @param mixed $tag
+	 * @param int $page
+	 * @param int $limitPerPage
+	 * @param bool $includePrivate
+	 */
+	public static function getLinksForTag($tags, $page, $limitPerPage, $includePrivate = false)
 	{
 		
 		$db = PlonkWebsite::getDB();
 		
-		$links 	= $db->retrieve(
-					sprintf(
-						'SELECT links.*, GROUP_CONCAT(links_tags.tag) AS tags FROM links INNER JOIN links_tags ON links.id = links_tags.link_id WHERE links.id IN (SELECT link_id FROM links_tags WHERE links_tags.tag = "%s") %s GROUP BY links.id ORDER BY links.id DESC LIMIT %d, %d',
-						$db->escape((string) $tag),
-						((!(bool) $includePrivate) ? 'AND links.private = 0' : ''),
-						((int) $page * (int) $limitPerPage),
-						(int) $limitPerPage
-					)
-				);		
+		// build query
+			$query[0] 	= 'SELECT links.*, GROUP_CONCAT(links_tags.tag) AS tags FROM links '
+						. 'INNER JOIN links_tags ON links.id = links_tags.link_id';
+			
+			foreach ((array) $tags as $i => $tag)
+			{
+				$query[0] .= ' INNER JOIN links_tags AS lt'.$i.' ON links_tags.link_id = lt'.$i.'.link_id';
+				if ($i == 0)
+					$query[1] = sprintf(' WHERE lt'.$i.'.tag = "%s"', $db->escape($tag));
+				else
+					$query[1] .= sprintf(' AND lt'.$i.'.tag = "%s"', $db->escape($tag));
+			}
+			
+			if (!$includePrivate)
+				$query[1] .= ' AND links.private = 0';
+		
+		// add pagination
+			$query[2] 	= sprintf(
+							' GROUP BY links.id' .
+							' ORDER BY links.id DESC LIMIT %d, %d',
+							((int) $page * (int) $limitPerPage),
+							(int) $limitPerPage
+						);
 				
-		return (array) $links;
+		// execute query and return result
+			$links 	= $db->retrieve(implode($query));
+			return (array) $links;
 	}
 	
 	
-	public static function getTag($tag)
+	/**
+	 * Gets all related tags (including the count) for a tag
+	 * @param string $tag
+	 */
+	public static function getRelatedTagsForTag($tags, $includePrivate = false)
+	{
+		
+		$db = PlonkWebsite::getDB();
+		
+		// build query
+			$query[0] 	= 'SELECT distinct(lt0.tag) AS tag, COUNT(lt0.tag) AS qty FROM links_tags AS lt '
+						. 'INNER JOIN links ON links.id = lt.link_id';
+			
+			foreach ((array) $tags as $i => $tag)
+			{
+				$query[0] .= ' LEFT OUTER JOIN links_tags AS lt'.$i.' ON lt.link_id = lt'.$i.'.link_id ';
+				if ($i == 0)
+					$query[1] = sprintf(' WHERE lt.tag = "%s" AND lt'.$i.'.tag != "%s"', $db->escape($tag), $db->escape($tag));
+				else
+				{
+					for ($j = 0; $j <= $i; $j++)
+					{
+						if ($j != $i)
+							$query[1] .= sprintf(' AND lt'.$j.'.tag != "%s"', $db->escape($tag));
+						else
+							$query[1] .= sprintf(' AND lt'.$j.'.tag = "%s"', $db->escape($tag));
+					}
+				}
+			}
+			
+			if (!$includePrivate)
+				$query[1] .= ' AND links.private = 0';
+		
+		// add pagination
+			$query[2] 	= ' GROUP BY lt0.tag'
+						. ' ORDER BY lt0.tag ASC';
+					
+		// execute query and return result
+			$tags 	= $db->retrieve(implode($query));
+			return (array) $tags;
+		
+	}
+	
+	
+	/**
+	 * Gets a specific tag
+	 * @param string $tag
+	 * @todo Make this work to show only public tags too
+	 */
+	public static function getTag($tag, $includePrivate = false)
 	{
 		
 		$db = PlonkWebsite::getDB();
 		
 		$tag 	= $db->getVar(
-					sprintf('SELECT * FROM tags WHERE tag = "%s"',
+					sprintf(
+						'SELECT tags.tag FROM tags WHERE tag = "%s"',
 						$db->escape((string) $tag)
 					)
 				);
@@ -117,10 +214,51 @@ class BrowseDB
 		
 	}
 	
-	public static function tagExists($tag)
+	
+	/**
+	 * Gets a tag list (top tags)
+	 * @param int $limit
+	 */
+	public static function getTagslist($includePrivate = false, $limit = 10)
 	{
-		$tag = self::getTag((string) $tag);
-		return ($tag !== null);
+		
+		$db = PlonkWebsite::getDB();
+		
+		$tags	= $db->retrieve(
+					sprintf(
+						'SELECT tag, %s AS qty FROM tags ' .
+						'WHERE SUBSTR(tag, 1, 4) != "for:" ' .		// exclude for:[username] links
+						'AND %s > 0 ' .								// exclude tags that have 0 links
+						'ORDER BY %s DESC ' .
+						'LIMIT 0, %d',
+						(($includePrivate) ? 'qty' : 'public_qty'),
+						(($includePrivate) ? 'qty' : 'public_qty'),
+						(($includePrivate) ? 'qty' : 'public_qty'),
+						(int) $limit
+					)
+				);
+				
+		return (array) $tags;
+		
+	}
+	
+	
+	/**
+	 * Checks whether an array of tags exist
+	 * @param mixed $tag
+	 */
+	public static function tagExists($tags, $includePrivate = false)
+	{
+		
+		$tags = (array) $tags;
+		
+		foreach ($tags as $tag)
+		{
+			if (self::getTag((string) $tag, $includePrivate) === null) return false;
+		}
+		
+		return true;
+		
 	}
 	
 }

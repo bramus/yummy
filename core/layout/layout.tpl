@@ -29,7 +29,7 @@
 		</div>
 		
 		<!-- content -->
-		<div id="content">
+		<div id="content" class="clearfix">
 			
 			{$pageContent}
 			

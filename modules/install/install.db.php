@@ -125,8 +125,10 @@ class InstallDB
 				{
 					
 					// insert tag
-					$db->execute(sprintf('INSERT INTO tags (tag, qty) VALUES ("%s", 1) ON DUPLICATE KEY UPDATE qty = qty + 1',
-						$db->escape(utf8_decode($tag))
+					$db->execute(sprintf('INSERT INTO tags (tag, qty, public_qty) VALUES ("%s", 1, %d) ON DUPLICATE KEY UPDATE qty = qty + 1, public_qty = public_qty + %d',
+						$db->escape(utf8_decode($tag)),
+						(int) $private,
+						(int) $private
 					));
 					
 					// link the tag to the link

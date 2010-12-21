@@ -1,28 +1,28 @@
-<h2><span class="username">{$username}'s</span> bookmarks</h2>
-
-{option:oNoLinks}
-	<p>No links have been bookmarked so far. Make sure you've run <a href="/install">the import/install script</a> first</p>
-{/option:oNoLinks}
-
-{option:oHasLinks}
-<ul class="links">
-	{iteration:iLinks}
-	<li class="link clearfix private-{$private}">
-		{option:newDate}<span class="date">{$addedNice}</span>{/option:newDate}
-		<h3><a href="{$link|htmlentities}" title="{$title|htmlentities}" data-added="{$added}" data-private="{$private}" class="link">{$title|htmlentities}</a></h3>
-		{option:oDescription}<p class="description">{$description|htmlentities}</p>{/option:oDescription}
-		{option:oHasTags}
-		<ul class="tags">
-			{iteration:iTags}
-			<li><a href="/{$MODULE}/tag/{$tag|htmlentities|urlencode}">{$tag}</a></li>
-			{/iteration:iTags}
-		</ul>
-		{/option:oHasTags}
-	</li>
-	{/iteration:iLinks}
-</ul>
-{/option:oHasLinks}
-
+<div id="main">
+	<h2><span class="username">{$username}'s</span> bookmarks</h2>
+	{option:oNoLinks}
+		<p>No links have been bookmarked so far. Make sure you've run <a href="/install">the import/install script</a> first</p>
+	{/option:oNoLinks}
+	
+	{option:oHasLinks}
+	<ul class="links">
+		{iteration:iLinks}
+		<li class="link clearfix private-{$private}">
+			{option:newDate}<span class="date">{$addedNice}</span>{/option:newDate}
+			<h3><a href="{$link|htmlentities}" title="{$title|htmlentities}" data-added="{$added}" data-private="{$private}" class="link">{$title|htmlentities}</a></h3>
+			{option:oDescription}<p class="description">{$description|htmlentities}</p>{/option:oDescription}
+			{option:oHasTags}
+			<ul class="tags">
+				{iteration:iTags}
+				<li><a href="/{$MODULE}/tag/{$tag|htmlentities|urlencode}">{$tag}</a></li>
+				{/iteration:iTags}
+			</ul>
+			{/option:oHasTags}
+		</li>
+		{/iteration:iLinks}
+	</ul>
+	{/option:oHasLinks}
+	
 	<div class="pagination-wrap clearfix">
 		<div class="pagination">
 			<ul class="clearfix">
@@ -57,3 +57,11 @@
 		</div>
 	</div>
 	<p class="numlinks">{$numLinks} bookmarks</p>
+</div>
+
+<div id="sidebar">
+	<div id="topTags">
+		<h4>Top Tags</h4>
+		{$topTags}
+	</div>
+</div>
