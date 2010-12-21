@@ -5,6 +5,7 @@
 	<title>{$pageTitle}</title>
 	
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+	<link rel="shortcut icon" href="/favicon.ico" />
 	
 	<link rel="stylesheet" type="text/css" media="screen" href="/core/css/reset.css" />
 	<link rel="stylesheet" type="text/css" media="screen" href="/core/css/screen.css" />
