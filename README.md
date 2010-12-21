@@ -1,4 +1,4 @@
-# Yummy — Version 2.1
+# Yummy — Version 2.1.1
 
 A self hosted Delicious (with del.icio.us import).
 
@@ -18,9 +18,9 @@ Once imported you are able to browse through them, in a true Delicious style.
 3) Import `yummy.sql` in a MySQL database of choice to create the necessary tables.
 4) Point your browser to `index.php` and continue with the installation.
 
-## Upgrading from 2.0
+## Upgrading from 2.1 or older
 
-Unfortunately Yummy 2.1 is not a drop in replacement as the DB schema has changed a tad.
+Unfortunately Yummy 2.1.1 is not a drop in replacement as the DB schema has changed a tad.
 You'll need to re-import a Delicious export for this version to work properly.
 
 ## Note
