@@ -37,12 +37,14 @@ CREATE TABLE `links` (
 --
 
 CREATE TABLE `links_tags` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `link_id` int(11) NOT NULL,
   `tag` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
   UNIQUE KEY `links_tags` (`link_id`,`tag`),
   KEY `link_id` (`link_id`),
   KEY `tag` (`tag`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ;
 
 -- --------------------------------------------------------
 

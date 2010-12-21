@@ -96,7 +96,7 @@ class BrowseDB
 		
 		$links 	= $db->retrieve(
 					sprintf(
-						'SELECT links.*, GROUP_CONCAT(links_tags.tag) AS tags FROM links INNER JOIN links_tags ON links.id = links_tags.link_id %s GROUP BY links.id ORDER BY links.id DESC LIMIT %d, %d',
+						'SELECT links.*, GROUP_CONCAT(links_tags.tag) AS tags FROM links INNER JOIN links_tags ON links.id = links_tags.link_id %s GROUP BY links.id ORDER BY links.id DESC, links_tags.id ASC LIMIT %d, %d',
 						((!(bool) $includePrivate) ? 'WHERE links.private = 0' : ''),
 						((int) $page * (int) $limitPerPage),
 						(int) $limitPerPage
@@ -138,7 +138,7 @@ class BrowseDB
 		// add pagination
 			$query[2] 	= sprintf(
 							' GROUP BY links.id' .
-							' ORDER BY links.id DESC LIMIT %d, %d',
+							' ORDER BY links.id DESC, links_tags.id ASC LIMIT %d, %d',
 							((int) $page * (int) $limitPerPage),
 							(int) $limitPerPage
 						);
