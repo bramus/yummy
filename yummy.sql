@@ -53,5 +53,6 @@ CREATE TABLE `links_tags` (
 CREATE TABLE `tags` (
   `tag` varchar(255) NOT NULL,
   `qty` int(11) NOT NULL,
+  `public_qty` int(11) NOT NULL,
   PRIMARY KEY (`tag`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
