@@ -367,11 +367,13 @@ class BrowseController extends PlonkController {
 						
 						$this->pageTpl->setIteration('iTags', 'iLinks');
 						
+						$lctags = array_map('strtolower', $tags);
+						
 						foreach ($linktags as $ltag)
 						{
 							
 							$this->pageTpl->assignIteration('tag',	$ltag);
-							if (in_array(urldecode($ltag), $tags)) $this->pageTpl->assignIterationOption('oActive');
+							if (in_array(strtolower($ltag), $lctags)) $this->pageTpl->assignIterationOption('oActive');
 							$this->pageTpl->refillIteration('iTags');
 							
 						}
