@@ -91,26 +91,42 @@ class InstallDB
 		$description = '';
 		$lastInsertId = 0;
 		$numLinks = 0;
+		$prevDate = 0;
 		
 		foreach($lines as $line)
 		{
-			
-			// description
-			if (substr($line,0,4) == '<DD>')
-			{
-				
-				// extract description
-				$description = substr($line, 4);
-				
-			}
-			
+
 			// link
 			if ((substr($line,0,4) == '<DT>') || (substr($line,0,11) == '<DL><p><DT>'))
 			{			
 				
-				// extract link, tags and date
-				preg_match('/\<A HREF="(.*?)" ADD_DATE="(.*?)" PRIVATE="(.*?)" TAGS="(.*?)"\>(.*?)\<\/A\>/', substr($line,4), $matches);				
-				list($orig, $link, $date, $private, $tags, $title) = $matches;
+				// extract link, private, tags and date
+				preg_match('/\<A HREF="(.*?)" ADD_DATE="(.*?)" PRIVATE="(.*?)" TAGS=("?)(.*?)("?)\>(.*?)\<\/A\>/', substr($line,4), $matches);
+				
+				// data extracted!
+				if (sizeof($matches) == 8) {
+					list($orig, $link, $date, $private, $quot1, $tags, $quot2, $title) = $matches;
+				}
+				
+				// Data not extracted, try again
+				// @note: In the new Delicious export, when no tags are entered, the tags attribute is omitted (great, huh?)
+				else { 
+					
+					// extract link, private and date
+					preg_match('/\<A HREF="(.*?)" ADD_DATE="(.*?)" PRIVATE="(.*?)"\>(.*?)\<\/A\>/', substr($line,4), $matches);
+					
+					// data extracted!
+					if (sizeof($matches) == 5) {
+						list($orig, $link, $date, $private, $title) = $matches;
+					}
+					
+					// data not extracted, skip link.
+					else continue;
+					
+				}
+				
+				// Apparently, the new Delicious doesn't know for sure when you've added a link
+				if ($date == 'None') $date = $prevDate;
 				
 				// insert link
 				$linkId = $db->execute(sprintf('INSERT INTO links (link, title, description, added, private) VALUES ("%s", "%s", "%s", "%s", %d)',
@@ -145,6 +161,26 @@ class InstallDB
 				// increment the number of links imported
 				$numLinks++;
 				
+				// keep track of the previous date
+				$prevDate = $date;
+				
+			}
+
+			// description
+			else if (substr($line,0,4) == '<DD>')
+			{
+
+				// extract description (and modify it a bit first to get the same results for the old and the new delicious)
+				$description = html_entity_decode(strip_tags(substr($line, 4))) . $description;
+
+			}
+
+			// description (multiline comment)
+			else if (substr($line,0,1) != '<') {
+
+				// extract description (and modify it a bit first to get the same results for the old and the new delicious)
+				$description = html_entity_decode(strip_tags($line)) . $description;
+
 			}
 			
 		}
