@@ -1,4 +1,4 @@
-# Yummy — Version 2.1.1
+# Yummy — Version 2.2
 
 A self hosted Delicious (with del.icio.us import).
 
