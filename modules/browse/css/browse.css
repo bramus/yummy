@@ -120,16 +120,15 @@ ul.tagslist li a span {
 }
 
 ul.tagslist li a span.tag {
-	width: 128px;
 	padding-left: 2px;
 }
 
 ul.tagslist li a span.qty {
-	width: 18px;
 	padding-right: 2px;
 	text-align: right;
 	color: #666;
 	font-weight: 700;
+	float: right;
 }
 
 ul.tagslist li a:hover span.tag {

@@ -294,8 +294,12 @@
 			color: #000;
 		}
 		
+		form dt label.nocase {
+			text-transform: none;
+		}
+		
 		form dd, form dt {
-			height: 30px;
+			min-height: 30px;
 			line-height: 30px;
 			color: #666;
 		}
