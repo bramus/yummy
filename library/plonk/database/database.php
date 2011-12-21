@@ -7,7 +7,11 @@
  * @package		Plonk
  * @subpackage	database
  * @author		Bramus Van Damme <bramus.vandamme@kahosl.be>
- * @version		1.0 - Nothing chanced, only bumped to version 1.0 for release.
+ * @version		1.1 - IMPROVEMENT: Added backticks around fieldnames and tablenames, allowing one to use keywords as field/table-names (which you shouldn't, but hey)
+ * 					  IMPROVEMENT: Code reformatted to resemble the ikdoeict coding guidelines
+ * 					  BUGFIX: Now respects NULL and numeric values in insert() and update() functions by not quotes around them
+ * 					  BUGFIX: getDB() (Singleton Pattern) now takes connection settings into account, allowing one to have several instances, each having their own connection settings, retrievable via getDB().
+ * 				1.0 - Nothing changed, only bumped to version 1.0 for release.
  * 				0.9 - Added Singleton Pattern
  * 				0.8 - Added extra special getEnumValues() and filterArrayByTable() functions who behave according to the DB-model
  * 				0.7 - Added extra get functionalities for commonly executed actions (getColumnAsArray, getVar, getPairsAsArray, getNumRows)
@@ -20,14 +24,14 @@
  */
 
 class PlonkDB {
-	
-	
+
+
 	/**
 	 * The version of this class
 	 * 
 	 * @var double
 	 */
-	const version = 1.0;
+	const version = 1.1;
 
 
 	/**
@@ -36,63 +40,63 @@ class PlonkDB {
 	 * @var bool
 	 */
 	private $debug = false;
-	
-	
+
+
 	/**
 	 * Database Handler / Instance of the connection
 	 * 
 	 * @var	mysqli
 	 */
 	private $dbHandler;
-	
-	
+
+
 	/**
 	 * Database Host
 	 * 
 	 * @var	string
 	 */
 	private $dbHost;
-	
-	
+
+
 	/**
 	 * Database Name
 	 * 
 	 * @var	string
 	 */
 	private $dbName;
-	
-	
+
+
 	/**
 	 * Database Password
 	 * 
 	 * @var	string
 	 */
 	private $dbPass;
-	
-	
+
+
 	/**
 	 * Database Username
 	 * 
 	 * @var	string
 	 */
 	private $dbUser;
-	
-	
+
+
 	/**
 	 * The recent queries
 	 * 
 	 * @var array
 	 */
 	private $queries;
-	
-	
+
+
 	/**
 	 * Static Instance
 	 * 
 	 * @var PlonkDB
 	 */
 	static $instance = null;
-	
+
 
 	/**
 	 * Constructor
@@ -104,15 +108,14 @@ class PlonkDB {
 	 * 
 	 * @return	void
 	 */
-	public function __construct($dbHost, $dbUser, $dbPass, $dbName)
-	{
-		
+	public function __construct($dbHost, $dbUser, $dbPass, $dbName) {
+	
 		// store arguments as datamembers
-		$this->dbHost	= (string) $dbHost;
-		$this->dbUser	= (string) $dbUser;
-		$this->dbPass	= (string) $dbPass;
-		$this->dbName	= (string )$dbName;
-		
+		$this->dbHost = (string) $dbHost;
+		$this->dbUser = (string) $dbUser;
+		$this->dbPass = (string) $dbPass;
+		$this->dbName = (string) $dbName;
+	
 	}
 
 
@@ -121,12 +124,11 @@ class PlonkDB {
 	 *
 	 * @return	void
 	 */
-	public function __destruct()
-	{
-		
+	public function __destruct() {
+	
 		// Make sure we're disconnected
 		$this->disconnect();
-		
+	
 	}
 
 
@@ -135,17 +137,14 @@ class PlonkDB {
 	 *
 	 * @return	void
 	 */
-	public function connect()
-	{
-		
+	public function connect() {
+	
 		// create handler
-		$this->dbHandler = @mysqli_connect($this->dbHost, $this->dbUser, $this->dbPass);
-		
-		if (!@mysqli_select_db($this->dbHandler, $this->dbName)) throw new Exception("The database defined does not exist");
+		$this->dbHandler = @mysqli_connect($this->dbHost, $this->dbUser, $this->dbPass, $this->dbName);
 
 		// validate connection
 		if (!$this->dbHandler) throw new Exception("Could not connect to databaserver or access database." . PHP_EOL . mysqli_connect_error());
-		
+	
 	}
 
 
@@ -157,37 +156,36 @@ class PlonkDB {
 	 * 
 	 * @return	int
 	 */
-	public function delete($table, $where)
-	{
-		
+	public function delete($table, $where) {
+	
 		// rework vars
 		$table = (string) $table;
 		$where = (string) $where;
-		
+	
 		// build query
-		$query = 'DELETE FROM '.$table;
-		if($where != '') $query .=' WHERE '. $where;
+		$query = 'DELETE FROM `' . $table . '`';
+		if($where != '') $query .=' WHERE ' . $where;
 		$query .= ';';
 
 		// execute query and return affected rows
 		return $this->execute($query);
+	
 	}
-	
-	
+
+
 	/**
 	 * Closes a previously opened database connection
 	 *
 	 * @return	void
 	 */
-	public function disconnect()
-	{
-		
+	public function disconnect() {
+	
 		// Close the connection
 		@mysqli_close($this->dbHandler);
-		
+	
 		// set dbHandler to NULL
 		$this->dbHandler = null;
-		
+	
 	}
 
 
@@ -196,33 +194,30 @@ class PlonkDB {
 	 * @param mixed $param
 	 * @return string
 	 */
-	public function escape($param)
-	{
-		
+	public function escape($param) {
+	
 		// connect if needed
 		if(!$this->dbHandler) $this->connect();
-		
+	
 		// given param is an array
-		if (is_array($param))
-		{
-			
+		if (is_array($param)) {
+		
 			// run all params through this escape function
 			return array_map(array('PlonkDB', 'escape'), $param);
-			
-		}
 		
+		}
+	
 		// given param is not an array
-		else
-		{
-			
+		else {
+		
 			// escape and return it
 			return @mysqli_escape_string($this->dbHandler, $param);
-			
-		}
 		
+		}
+	
 	}
-	
-	
+
+
 	/**
 	 * Executes a query returns the last inserted or the affected rows
 	 *
@@ -230,21 +225,19 @@ class PlonkDB {
 	 * 
 	 * @return	int
 	 */
-	public function execute($query)
-	{
-		
+	public function execute($query) {
+	
 		// redefine var
 		$query = (string) $query;
-		
+	
 		// connect if needed
 		if(!$this->dbHandler) $this->connect();
-		
+	
 		// store query on $queries
 		$this->storeQuery($query);
 
 		// execute query
-		if($result = @mysqli_query($this->dbHandler, $query))
-		{ 
+		if($result = @mysqli_query($this->dbHandler, $query)) { 
 			@mysqli_free_result($result);
 		} else throw new Exception('There was an error while executing the query ' . $query . PHP_EOL . mysqli_error($this->dbHandler));
 
@@ -253,7 +246,7 @@ class PlonkDB {
 
 		// It's not an INSERT query, return the number of affected rows
 		return (int) mysqli_affected_rows($this->dbHandler);
-		
+	
 	}
 
 
@@ -265,36 +258,35 @@ class PlonkDB {
 	 *
 	 * @return array
 	 */
-	public function filterArrayByTable($aValues, $table)
-	{
-		
+	public function filterArrayByTable($aValues, $table) {
+	
 		// Get all fields for the given table
-		$fields		= $this->retrieve("DESCRIBE " . $table);
-	
+		$fields = $this->retrieve('DESCRIBE `' . $table . '`');
+
 		// the filtered values
-		$fValues	= Array();
-	
+		$fValues = Array();
+
 		// Loop all fields
 		foreach ($fields as $field) {
-			
+		
 			// extract fieldname
-			$fieldname	= $field["Field"];
-			
+			$fieldname = $field['Field'];
+		
 			// fieldname appears in $aValues
 			if (isset($aValues[$fieldname])) {
-				
+			
 				// store the passed in value onto the filtered values array
 				$fValues[$fieldname] = $aValues[$fieldname];
-				
-			}
 			
+			}
+		
 		}
-	
+
 		// return the filtered values
 		return $fValues;
-		
-	}
 	
+	}
+
 
 	/**
 	 * Gets a resultcolumn as an array
@@ -304,44 +296,43 @@ class PlonkDB {
 	 * 
 	 * @return	array
 	 */
-	public function getColumnAsArray($query, $columnIndex = 0)
-    {
-    	
+	public function getColumnAsArray($query, $columnIndex = 0) {
+	
 		// rework params
 		$query = (string) $query;
-		
-	    	// init var
-	    	$toReturn = array();
 	
-	    	// get values
-	    	$result = (array) $this->retrieve($query);
-	
-	    	// we've got no result, return an empty array
+		// init var
+		$toReturn = array();
+
+		// get values
+		$result = (array) $this->retrieve($query);
+
+			// we've got no result, return an empty array
 		if(empty($result)) return $toReturn;
-		
+	
 		// requested column number does not exist
 		if ($columnIndex > sizeof($result[0])) throw new Exception('The requested $columnIndex does not exist');
 
 		// fetch all keys from result
-		$keys	= array_keys($result[0]);
+		$keys = array_keys($result[0]);
 
 		// extract the key for the given columnnumber
-		if (is_numeric($columnIndex)) 
-		{
-			$key		= $keys[$columnIndex]; 		// the one key
-		} 
-		else $key	= $columnIndex;				// the given columnIndex *is* the one key
+		if (is_numeric($columnIndex)) {
+			$key = $keys[$columnIndex]; // the one key
+		} else {
+			$key = $columnIndex; // the given columnIndex *is* the one key
+		}
 
 		// make sure the key exists
 		if (!in_array($key, $keys)) throw new Exception('The requested $columnIndex does not exist');
-		
+	
 		// now that we have the needed key, go fetch all values
-        foreach($result as $row) $toReturn[] = $row[$key];
+		foreach($result as $row) $toReturn[] = $row[$key];
 
-        // return the extracted data
-        return $toReturn;
-		
-    }
+		// return the extracted data
+		return $toReturn;
+	
+	}
 
 
 	/**
@@ -354,24 +345,25 @@ class PlonkDB {
 	 * 
 	 * @return	PlonkDB
 	 */
-	public static function getDB($dbHost, $dbUser, $dbPass, $dbName)
-	{
-		
+	public static function getDB($dbHost, $dbUser, $dbPass, $dbName) {
+	
+		// define a key identifying the connection
+		$key = md5($dbHost.$dbUser.$dbPass.$dbName);
+	
 		// no instance has been created yet
-		if (self::$instance == null)
-		{
-		
+		if (!isset(self::$instance[$key]) || self::$instance[$key] == null) {
+	
 			// Create a new instance and store it
-			self::$instance = new PlonkDB($dbHost, $dbUser, $dbPass, $dbName);
-			
+			self::$instance[$key] = new PlonkDB($dbHost, $dbUser, $dbPass, $dbName);
+		
 		}
-		
+	
 		// return the instance
-		return self::$instance;
-		
+		return self::$instance[$key];
+	
 	}
-	
-	
+
+
 	/**
 	 * Retrieves the possible ENUM-values from a given field
 	 *
@@ -380,29 +372,28 @@ class PlonkDB {
 	 * 
 	 * @return	array
 	 */
-	public function getEnumValues($table, $field)
-	{
-		
+	public function getEnumValues($table, $field) {
+	
 		// rework params
 		$table = (string) $table;
 		$field = (string) $field;
-		
-	    	// build query
-	    	$query = 'SHOW COLUMNS FROM '. $table .' LIKE "' . $this->escape($field) . '"';
 	
-	    	// get information
-	    	$row = $this->retrieveOne($query);
-	
-	    	// check if this is a enum-field
-	    	if(!isset($row['Type'])) throw new Exception('getEnumValues error: the given field does not exist');
-	    	if(strtolower(substr($row['Type'], 0, 4) != 'enum')) throw new Exception('getEnumValues error: '.(string) $field.' isn\'t an ENUM field.');
-	
-	    	// extract values by search&replacing
-	    	$aSearch = array('enum', '(', ')', '\'');
-	    	$types = str_replace($aSearch, '', $row['Type']);
-	
-	    	// return
-	    	return (array) explode(',', $types);
+		// build query
+		$query = 'SHOW COLUMNS FROM `'. $table .'` LIKE "' . $this->escape($field) . '"';
+
+		// get information
+		$row = $this->retrieveOne($query);
+
+		// check if this is a enum-field
+		if(!isset($row['Type'])) throw new Exception('getEnumValues error: the given field ' . (string) $field . ' does not exist');
+		if(strtolower(substr($row['Type'], 0, 4) != 'enum')) throw new Exception('getEnumValues error: ' . (string) $field . ' isn\'t an ENUM field.');
+
+		// extract values by search&replacing
+		$aSearch = array('enum', '(', ')', '\'');
+		$types = str_replace($aSearch, '', $row['Type']);
+
+		// return
+		return (array) explode(',', $types);
 	}
 
 
@@ -422,18 +413,17 @@ class PlonkDB {
 	 * 
 	 * @return	int
 	 */
-	public function getNumRows($query)
-	{
-		
+	public function getNumRows($query) {
+	
 		// redefine var
 		$query = (string) $query;
-		
+	
 		// connect if needed
 		if(!$this->dbHandler) $this->connect();
-		
+	
 		// store query on $queries
 		$this->storeQuery($query);
-		
+	
 		// init var
 		$numRows = 0;
 
@@ -445,7 +435,7 @@ class PlonkDB {
 
 		// return
 		return (int) $numRows;
-		
+	
 	}
 
 
@@ -458,69 +448,67 @@ class PlonkDB {
 	 * 
 	 * @return	array
 	 */
-	public function getPairsAsArray($query, $columnIndex1 = 0, $columnIndex2 = 1)
-	{
-    	
+	public function getPairsAsArray($query, $columnIndex1 = 0, $columnIndex2 = 1) {
+	
 		// rework params
 		$query = (string) $query;
-		
-	    	// init var
-	    	$toReturn = array();
 	
-	    	// get values from DB
-	    	$result = (array) $this->retrieve($query);
-	
-	    	// No result, return empty array
+		// init var
+		$toReturn = array();
+
+		// get values from DB
+		$result = (array) $this->retrieve($query);
+
+		// No result, return empty array
 		if(empty($result)) return $toReturn;
-		
+	
 		// Got result, yet no minimum required 2 columns returned, ergo not usable for getPairsAsArray
 		if (sizeof($result[0]) < 2) throw new Exception('Could not complete getPairsAsArray as the query returned too little (minimum 2 required) columns.');
 
 		// extra all keys from the result array
-		$keys	= array_keys($result[0]);
+		$keys = array_keys($result[0]);
 
 		// extract the key for the given columnnumber (first col)
-		if (is_numeric($columnIndex1)) 
-		{
-			$keyC1		= $keys[$columnIndex1]; 		// the one key
-		} else $keyC1	= $columnIndex1;				// the given columnIndex *is* the one key
+		if (is_numeric($columnIndex1)) {
+			$keyC1 = $keys[$columnIndex1]; // the one key
+		} else {
+			$keyC1 = $columnIndex1; // the given columnIndex *is* the one key
+		}
 
 		// extract the key for the given columnnumber (second col)
-		if (is_numeric($columnIndex2))
-		{ 
-			$keyC2		= $keys[$columnIndex2]; 		// the one key
-		} else $keyC2	= $columnIndex2;				// the given columnIndex *is* the one key
-		
+		if (is_numeric($columnIndex2)) { 
+			$keyC2 = $keys[$columnIndex2]; // the one key
+		} else {
+			$keyC2 = $columnIndex2; // the given columnIndex *is* the one key
+		}
 
 		// make sure the key exists
 		if (!in_array($keyC1, $keys) || !in_array($keyC2, $keys)) throw new Exception('The requested $columnIndex does not exist');
-		
+	
 		// build toReturn
-        foreach($result as $row) $toReturn[$row[$keyC1]] = $row[$keyC2];
+		foreach($result as $row) $toReturn[$row[$keyC1]] = $row[$keyC2];
 
-        // return result
-        return $toReturn;
-		
+		// return result
+		return $toReturn;
+	
 	}
-	
-	
+
+
 	/**
 	 * Gets the $num-th previously made query - viz. 1 gets the last, 2 gets the 2nd last, ...
 	 * @param int $num
 	 * @return string
 	 */
-	public function getPreviousQuery($num = 1)
-	{
-			
+	public function getPreviousQuery($num = 1) {
+		
 		// given num exists
-		if (isset($this->queries[$num-1]))
-		{
+		if (isset($this->queries[$num-1])) {
 			return $this->queries[$num-1];
 		}
-			
-		// no result, return empty string
-		else return '';
 		
+		// no result, return empty string
+		return '';
+	
 	}
 
 
@@ -532,9 +520,8 @@ class PlonkDB {
 	 * 
 	 * @return	mixed
 	 */
-	public function getVar($query, $columnIndex = 0)
-	{
-    	
+	public function getVar($query, $columnIndex = 0) {
+	
 		// call getColumnAsArray
 		$result = $this->getColumnAsArray($query, $columnIndex);
 
@@ -543,10 +530,10 @@ class PlonkDB {
 
 		// Got result, return only the first row
 		return $result[0];
-		
+	
 	}
-	
-	
+
+
 	/**
 	 * Builds a query for inserting records, inserts the insertId upon success
 	 *
@@ -555,28 +542,40 @@ class PlonkDB {
 	 * 
 	 * @return	int
 	 */
-	public function insert($table, $values)
-	{
+	public function insert($table, $values) {
 
 		// validate
 		if(empty($values) || !is_array($values)) throw new Exception('There are no values to insert, or the values parameter is not an array');
 
 		// redefine vars
-		$values	= (array) $values;
-		$table	= (string) $table;
+		$values = (array) $values;
+		$table = (string) $table;
 
 		// init vars
-		$valuesKeys		= array_keys($values);
-		$valuesValues	= array_values($values);
-
+		$valuesKeys = array_keys($values);
+		$valuesValues = array_values($values);
+	
 		// build query, part 1: INSERT INTO $table ($field1,$field2,...$fieldN) VALUES (
-		$query	= 'INSERT INTO '. $table .' (' . implode(', ', $valuesKeys) . ') VALUES (';
+		// + inject backticks while you are at it - could've been done in PHP 5.3 with $valuesKeys = array_map(function($v) { return '`'. $v . '`'; }, $valuesKeys);
+		$query = 'INSERT INTO `'. $table .'` (`' . implode('`, `', $valuesKeys) . '`) VALUES (';
 
 		// build query, part 2: inject values
-		for ($i = 0; $i < sizeof($values); $i++)
-		{
-			$query .= '"' . $this->escape($valuesValues[$i]) . '"';		// add the value, escape it first though.
-			if($i != sizeof($values) - 1) $query .= ', ';				// add a comma
+		for ($i = 0; $i < sizeof($values); $i++) {
+		
+			// add the value, escape it first though
+			if ($valuesValues[$i] === null) {
+				$query .= 'NULL';
+			} else if ((string) (float) $valuesValues[$i] === (string) $valuesValues[$i]) {
+				$query .= (float) $valuesValues[$i];
+			} else if ((string) (int) $valuesValues[$i] === (string) $valuesValues[$i]) {
+				$query .= (int) $valuesValues[$i];
+			} else {
+				$query .= '"' . $this->escape($valuesValues[$i]) . '"';
+			}
+		
+			// add a comma if not the last field
+			if($i != sizeof($values) - 1) $query .= ', ';
+		
 		}
 
 		// build query, part 3: end the query
@@ -586,7 +585,7 @@ class PlonkDB {
 		return $this->execute($query);
 
 	}
-	
+
 
 	/**
 	 * Executes a query and fetches an array of associative arrays from the DB
@@ -595,37 +594,35 @@ class PlonkDB {
 	 * 
 	 * @return	array
 	 */
-	public function retrieve($query)
-	{
-		
+	public function retrieve($query) {
+	
 		// redefine var
 		$query = (string) $query;
-		
+	
 		// init var
 		$data = array();
 
 		// connect if needed
 		if(!$this->dbHandler) $this->connect();
-		
+	
 		// store query on $queries
 		$this->storeQuery($query);
 
 		// execute query
-		if($result = mysqli_query($this->dbHandler, $query))
-		{
+		if($result = mysqli_query($this->dbHandler, $query)) {
 			// fetch data
 			while ($row = mysqli_fetch_assoc($result)) $data[] = $row;
 
 			// free some memory
 			@mysqli_free_result($result);
-		}
-		else throw new Exception(mysqli_error($this->dbHandler));
+		
+		} else throw new Exception(mysqli_error($this->dbHandler));
 
 		// return
 		return $data;
-		
-	}
 	
+	}
+
 
 	/**
 	 * Executes a query and fetches one associative array from the DB
@@ -634,57 +631,53 @@ class PlonkDB {
 	 * 
 	 * @return	array
 	 */
-	public function retrieveOne($query)
-	{
-		
+	public function retrieveOne($query) {
+	
 		// redefine var
 		$query = (string) $query;
-		
+	
 		// call retrieve
 		$result = $this->retrieve($query);
-		
+	
 		// return the first result (if any returned by retrieve) or an empty array
 		return ((sizeof($result) > 0) ? $result[0] : array());
-		
+	
 	}
-	
-	
+
+
 	/**
 	 * Toggles the debug setting
 	 * @param bool $enabled
 	 */
-	public function setDebug($enabled = true)
-	{
-		
+	public function setDebug($enabled = true) {
+	
 		// store the passed in value!
 		$this->debug = (bool) $enabled;
-			
+		
 	}
-	
-	
+
+
 	/**
 	 * Stores a query for debugging purposes
 	 * 
 	 * @param string $query
 	 */
-	private function storeQuery($query)
-	{
-		
+	private function storeQuery($query) {
+	
 		// rework var
 		$query = (string) $query;
-		
+	
 		// only store it if debug is enabled!
-		if ($this->debug === true)
-		{
-			
+		if ($this->debug === true) {
+		
 			// store it 
 			$this->queries = array_merge(array($query), (array) $this->queries);
-			
+		
 			// spare some memory by only storing the last 10 queries
 			$this->queries = array_slice($this->queries, 0, 10);
-			
-		}
 		
+		}
+	
 	}
 
 
@@ -697,76 +690,81 @@ class PlonkDB {
 	 * 
 	 * @return	int
 	 */
-	public function update($table, $values, $where = '')
-	{
+	public function update($table, $values, $where = '') {
 
 		// validate
 		if(empty($values) || !is_array($values)) throw new Exception('There are no values to update, or the values parameter is not an array');
 
 		// redefine vars
-		$values	= (array) $values;
-		$table	= (string) $table;
-		$where	= (string) $where;
+		$values = (array) $values;
+		$table = (string) $table;
+		$where = (string) $where;
 
 		// build query, part 1: UPDATE $table SET 
-		$query	= 'UPDATE '. $table .' SET ';
+		$query = 'UPDATE `' . $table . '` SET ';
 
 		// build query, part 2: inject values
 		$i = 0; // counter
-		foreach ($values as $key => $value)
-		{
-			$query .= $key . ' = "' . $this->escape($value) . '"';	// add the value, escape it first though.
-			if($i != sizeof($values) - 1) $query .= ', ';			// add a comma
+		foreach ($values as $key => $value) {
+		
+			// add the value, escape it first though (if needed)
+			if ($value === null) {
+				$query .= '`' . $key . '` = NULL';
+			} else if ((string) (float) $value === (string) $value) {
+				$query .= '`' . $key . '` = ' . (float) $value;
+			} else if ((string) (int) $value === (string) $value) {
+				$query .= '`' . $key . '` = ' . (int) $value;
+			} else {
+				$query .= '`' . $key . '` = "' . $this->escape($value) . '"';
+			}
+		
+			// add a comma if not the last field
+			if($i != sizeof($values) - 1) $query .= ', ';
+		
 			$i++;
+		
 		}
 
 		// build query, part 3: end the query
+	
+		// $where specified: use that as WHERE clause
+		if($where != '') {
+			$query .=' WHERE '. $where;
+		}
+	
+		// no $where specified: use the first field as the WHERE clause
+		else {
 		
-			// $where specified: use that as WHERE clause
-			if($where != '')
-			{
-				$query .=' WHERE '. $where;
-			}
-			
-			// no $where specified: use the first field as the WHERE clause
-			else {
-				
-				// extract keys & values from $values array
-				$keys = array_keys($values);
-				$vals = array_values($values);
-				
-				// inject the first key and the first value as the where clause
-				$query .=' WHERE '. $keys[0] . '= "' . $this->escape($vals[0]) . '"' ;
-				
-			}
+			// extract keys & values from $values array
+			$keys = array_keys($values);
+			$vals = array_values($values);
 		
-			// add trailing ;
-			$query .= ';';
+			// inject the first key and the first value as the where clause
+			$query .=' WHERE `'. $keys[0] . '` = "' . $this->escape($vals[0]) . '"' ;
+		
+		}
+
+		// add trailing ;
+		$query .= ';';
 
 		// execute query and return the result
 		return $this->execute($query);
-		
-	}
 	
-		
+	}
+
+	
 	/**
 	 * Returns the version of this class
 	 * 
 	 * @return double
 	 */
-	public static function version()
-	{
+	public static function version() {
+	
+		// just return it
 		return (float) self::version;
+	
 	}
 
-	
-	
-	public function getError()
-	{
-		
-		return mysqli_error($this->dbHandler);
-		
-	}
 }
 
 // EOF
