@@ -130,9 +130,9 @@ class InstallDB
 				
 				// insert link
 				$linkId = $db->execute(sprintf('INSERT INTO links (link, title, description, added, private) VALUES ("%s", "%s", "%s", "%s", %d)',
-					$db->escape(utf8_decode($link)),
-					$db->escape(htmlspecialchars_decode(utf8_decode($title), ENT_QUOTES)),
-					$db->escape(htmlspecialchars_decode(utf8_decode($description), ENT_QUOTES)),
+					$db->escape(($link)),
+					$db->escape(htmlspecialchars_decode(($title), ENT_QUOTES)),
+					$db->escape(htmlspecialchars_decode(($description), ENT_QUOTES)),
 					$db->escape(date('Y-m-d H:i:s', $date)),
 					$db->escape((int) $private)
 				));
