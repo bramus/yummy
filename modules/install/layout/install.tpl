@@ -27,7 +27,7 @@
 	{option:linksFound}
 <p class="warning">Installation has been completed before. Installing again will erase all existing links!</p>
 {/option:linksFound}
-	<p class="info">You can create an export of your bookmarks at <a href="http://www.delicious.com/settings/bookmarks/export">http://www.delicious.com/settings/bookmarks/export</a></p>
+	<p class="info">You can create an export of your bookmarks at <a href="http://export.delicious.com/settings/bookmarks/export">http://export.delicious.com/settings/bookmarks/export</a></p>
 </div>
 {*
 <div class="box" id="boxImport">
