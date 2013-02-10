@@ -25,9 +25,14 @@ li.link {
 	margin-left: 60px;
 }
 
-li.private-1 {
-	background: transparent url(../img/lock.gif) no-repeat 0 7px;
+a.link {
 	padding-left: 20px;
+	background-position: 0 50%;
+	background-repeat: no-repeat;
+}
+
+li.private-1 a.link {
+	background-image: url(../img/lock.gif) !important;
 }
 
 span.date {

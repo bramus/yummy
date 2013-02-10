@@ -213,6 +213,7 @@ class BrowseController extends PlonkController {
 					$niceDate = date('d M y', strtotime($link['added']));
 					
 					$this->pageTpl->assignIteration('link',			$link['link']);
+					$this->pageTpl->assignIteration('linkdomain',	parse_url($link['link'])['host']);
 					$this->pageTpl->assignIteration('title',		$link['title']);
 					$this->pageTpl->assignIteration('private',		$link['private']);
 					$this->pageTpl->assignIteration('added',		strtotime($link['added']));
@@ -341,6 +342,7 @@ class BrowseController extends PlonkController {
 					$niceDate = date('d M y', strtotime($link['added']));
 					
 					$this->pageTpl->assignIteration('link',			$link['link']);
+					$this->pageTpl->assignIteration('linkdomain',	parse_url($link['link'])['host']);
 					$this->pageTpl->assignIteration('title',		$link['title']);
 					$this->pageTpl->assignIteration('private',		$link['private']);
 					$this->pageTpl->assignIteration('added',		strtotime($link['added']));

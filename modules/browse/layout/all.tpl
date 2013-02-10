@@ -9,7 +9,7 @@
 		{iteration:iLinks}
 		<li class="link clearfix private-{$private}">
 			{option:newDate}<span class="date">{$addedNice}</span>{/option:newDate}
-			<h3><a href="{$link|htmlentities}" title="{$title|htmlentities}" data-added="{$added}" data-private="{$private}" class="link">{$title|htmlentities}</a></h3>
+			<h3><a href="{$link|htmlentities}" title="{$title|htmlentities}" data-added="{$added}" data-private="{$private}" class="link" style="background-image: url(//www.google.com/s2/favicons?domain={$linkdomain|urlencode})">{$title|htmlentities}</a></h3>
 			{option:oDescription}<p class="description">{$description|htmlentities|nl2br}</p>{/option:oDescription}
 			{option:oHasTags}
 			<ul class="tags">
